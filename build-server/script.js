@@ -1,12 +1,14 @@
 const {exec} = require('child_process');
 const path = require('path');
+
 const {S3Client,PutObjectCommand} = require('@aws-sdk/client-s3');
 const mime = require('mime-types');
+const { env } = require('process');
 const S3Client = new S3Client({
     region: 'ap-south-1',
     credentials:{
-        accessKeyId: 'AKIAXYKJQBYRXG6FIZEW',
-        secretAccessKey: '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',
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     }
 })
 
