@@ -4,12 +4,12 @@ const fs = require('fs');
 
 const {S3Client,PutObjectCommand} = require('@aws-sdk/client-s3');
 const mime = require('mime-types');
-const { env } = require('process');
+require('dotenv').config();
 const s3Client = new S3Client({
     region: 'ap-south-1',
     credentials:{
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
     }
 })
 
@@ -28,21 +28,23 @@ async function init() {
     p.on('close', async () => {
         console.log(`Build completed`);
         const distFolderPath = path.join(__dirname,'output','dist')
+        console.log("Distfolderpath")
         const distFolderContents = fs.readdirSync(distFolderPath,{recursive:true})
-
+        console.log("readdirsync")
         for(const file of distFolderContents){
             const filePath = path.join(distFolderPath,file)
+            console.log("filepath")
             if(fs.lstatSync(filePath).isDirectory()){
                 continue;
             }
             console.log('uploading',filePath)
             const command = new PutObjectCommand({
                 Bucket: 'vercel-clone26',
-                Key: `__outputs/${PROJECT_ID}/${filePath}`,
+                Key: `__outputs/${PROJECT_ID}/${file}`,
                 Body: fs.createReadStream(filePath),
-                ContentType: mime.lookup(filePath),
+                ContentType: mime.lookup(filePath)
             })
-
+            console.log("after put")
             await s3Client.send(command)
             console.log('Uploaded',filePath)
         }
